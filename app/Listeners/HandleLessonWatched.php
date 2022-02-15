@@ -32,7 +32,6 @@ class HandleLessonWatched
     public function handle(LessonWatched $event)
     {
         
-        
         $pivot = DB::table("lesson_user")
                         ->selectRaw("distinct(lesson_id)")
                         ->where("user_id",$event->user->id)
@@ -41,18 +40,21 @@ class HandleLessonWatched
         $ttlWatched = count($pivot);
         $achievement = WatchedType::where("watched",$ttlWatched)->first();
 
-        $achievementExist = $event->user->achievements()
-                    ->where("achievable_id",$achievement->id)
-                    ->where("achievable_type" , get_class($achievement))
-                    ->first();
         //dd($achievementExist);
-        if(!is_null($achievement) && is_null($achievementExist)){
-            Achievement::create([
-                "user_id" => $event->user->id,
-                "achievable_id" => $achievement->id,
-                "achievable_type" => get_class($achievement)
-            ]);
-            AchievementUnlocked::dispatch($event->user,$achievement->title);
+        if(!is_null($achievement) ){
+
+            $achievementExist = $event->user->achievements()
+                        ->where("achievable_id",$achievement->id)
+                        ->where("achievable_type" , get_class($achievement))
+                        ->first();
+            if(is_null($achievementExist)){
+                Achievement::create([
+                    "user_id" => $event->user->id,
+                    "achievable_id" => $achievement->id,
+                    "achievable_type" => get_class($achievement)
+                ]);
+                AchievementUnlocked::dispatch($event->user,$achievement->title);
+            }
         }
         
         
