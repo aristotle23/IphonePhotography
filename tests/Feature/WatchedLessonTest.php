@@ -19,7 +19,7 @@ class WatchedLessonTest extends TestCase
     {
         
         $lesson =  Lesson::factory()->create();
-        $response = $this->get("/users/2/watch/21/lesson",[
+        $response = $this->get("/users/2/watch/{$lesson->id}/lesson",[
             "accept" => "application/json"
         ]);
 

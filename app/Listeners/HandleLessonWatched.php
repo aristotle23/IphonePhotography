@@ -41,11 +41,12 @@ class HandleLessonWatched
         $ttlWatched = count($pivot);
         $achievement = WatchedType::where("watched",$ttlWatched)->first();
 
-        $oldAchievement = Achievement::where("user_id",$event->user->id)
+        $achievementExist = $event->user->achievements()
                     ->where("achievable_id",$achievement->id)
                     ->where("achievable_type" , get_class($achievement))
-                    ->get();
-        if(!is_null($achievement) && is_null($oldAchievement)){
+                    ->first();
+        //dd($achievementExist);
+        if(!is_null($achievement) && is_null($achievementExist)){
             Achievement::create([
                 "user_id" => $event->user->id,
                 "achievable_id" => $achievement->id,
